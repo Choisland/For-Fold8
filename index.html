@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6f4ef" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+  <meta name="description" content="접힘 상태에 따라 레이아웃이 바뀌는 폴더블 전용 리더 PWA">
+  <title>Fold Reader</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="title-wrap">
+        <h1 class="title" id="bookTitle">Fold Reader</h1>
+        <span class="mode-badge" id="modeBadge">single</span>
+      </div>
+      <div class="actions">
+        <button id="fontDown" aria-label="글자 작게">A−</button>
+        <button id="fontUp" aria-label="글자 크게">A+</button>
+        <button id="themeBtn" aria-label="테마 바꾸기"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 2a8 8 0 0 1 0 16z" fill="currentColor"/></svg></button>
+        <button id="openBtn" aria-label="텍스트 파일 열기">열기</button>
+        <button id="debugBtn" aria-label="화면 상태 보기" aria-expanded="false" aria-controls="debug">ⓘ</button>
+      </div>
+    </header>
+
+    <main class="stage" id="stage">
+      <div class="reader" id="reader">
+        <article class="flow" id="flow"></article>
+      </div>
+    </main>
+
+    <footer class="controls">
+      <button id="prevBtn" aria-label="이전 페이지">‹</button>
+      <div class="progress">
+        <input type="range" id="pageSlider" min="1" max="1" value="1" aria-label="페이지 이동">
+        <span class="page-label" id="pageLabel">1 / 1</span>
+      </div>
+      <button id="nextBtn" aria-label="다음 페이지">›</button>
+    </footer>
+  </div>
+
+  <div class="hinge" aria-hidden="true"></div>
+
+  <aside class="debug" id="debug" hidden>
+    <dl>
+      <dt>모드</dt><dd id="dbgMode">-</dd>
+      <dt>포스처</dt><dd id="dbgPosture">-</dd>
+      <dt>세그먼트</dt><dd id="dbgSegments">-</dd>
+      <dt>뷰포트</dt><dd id="dbgViewport">-</dd>
+      <dt>단 / 간격</dt><dd id="dbgCols">-</dd>
+    </dl>
+    <label>
+      모드 시뮬레이션
+      <select id="forceMode">
+        <option value="auto">자동 감지</option>
+        <option value="single">single (커버 화면)</option>
+        <option value="wide">wide (펼친 화면)</option>
+        <option value="book">book (세로 접힘)</option>
+        <option value="tabletop">tabletop (가로 접힘)</option>
+      </select>
+    </label>
+  </aside>
+
+  <input type="file" id="fileInput" accept=".txt,text/plain" hidden>
+  <script src="app.js" type="module"></script>
+</body>
+</html>

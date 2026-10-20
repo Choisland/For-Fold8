@@ -1,0 +1,209 @@
+:root {
+  --bg: #f6f4ef;
+  --panel: #fffdf8;
+  --fg: #1f1d1a;
+  --muted: #6b665e;
+  --line: #e2ddd2;
+  --accent: #3a63d8;
+  --font-size: 19px;
+  --pad: 16px;
+  /* JS가 접힘 상태에 맞춰 덮어쓴다 */
+  --seg-top-h: 50vh;
+  --hinge-h: 0px;
+  --hinge-x: 50vw;
+  --hinge-w: 0px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: #16151a; --panel: #201f25; --fg: #e8e6e1; --muted: #9a968f; --line: #34323a; --accent: #8fa8ff;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #16151a; --panel: #201f25; --fg: #e8e6e1; --muted: #9a968f; --line: #34323a; --accent: #8fa8ff;
+  color-scheme: dark;
+}
+:root[data-theme="sepia"] {
+  --bg: #f1e7d0; --panel: #f8f0dc; --fg: #3b2f20; --muted: #7d6a52; --line: #dccdab; --accent: #9a5b1e;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+body { overflow: hidden; overscroll-behavior: none; }
+
+button, select {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  min-height: 40px;
+  min-width: 40px;
+  padding: 0 10px;
+  cursor: pointer;
+}
+button:active { background: var(--line); }
+button:disabled { opacity: .35; cursor: default; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- 기본 레이아웃: 위 툴바 / 본문 / 아래 컨트롤 ---------- */
+.app {
+  height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas: "top" "stage" "controls";
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.topbar {
+  grid-area: top;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px var(--pad);
+  border-bottom: 1px solid var(--line);
+}
+.title-wrap { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mode-badge {
+  flex: none;
+  font-size: 11px;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+.actions { display: flex; gap: 6px; flex: none; }
+.actions svg { display: block; width: 18px; height: 18px; }
+
+/* 커버 화면처럼 좁은 폭에서는 툴바를 압축 */
+@media (max-width: 480px) {
+  .mode-badge { display: none; }
+  .actions { gap: 4px; }
+  .actions button { min-width: 36px; padding: 0 7px; }
+}
+
+.stage {
+  grid-area: stage;
+  min-height: 0;
+  padding: 20px var(--pad);
+  touch-action: pan-y;
+}
+.reader { height: 100%; overflow: hidden; }
+
+/* 본문은 CSS 다단(column)으로 페이지를 나누고, transform으로 넘긴다 */
+.flow {
+  height: 100%;
+  column-fill: auto;
+  font-family: "Noto Serif KR", "Nanum Myeongjo", "AppleMyungjo", serif;
+  font-size: var(--font-size);
+  line-height: 1.8;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  transition: transform .28s ease;
+}
+.flow.no-anim { transition: none; }
+@media (prefers-reduced-motion: reduce) { .flow { transition: none; } }
+
+.flow h2 { font-size: 1.3em; line-height: 1.4; margin: 0 0 1em; break-before: column; }
+.flow h2:first-child { break-before: auto; }
+.flow p { margin: 0 0 .8em; text-indent: 1em; text-align: justify; }
+.flow h2 + p { text-indent: 0; }
+
+.controls {
+  grid-area: controls;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px var(--pad);
+  border-top: 1px solid var(--line);
+}
+.controls button { font-size: 22px; line-height: 1; }
+.progress { flex: 1; display: flex; align-items: center; gap: 10px; min-width: 0; }
+.progress input { flex: 1; min-width: 0; accent-color: var(--accent); }
+.page-label {
+  flex: none;
+  min-width: 4.5em;
+  text-align: right;
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- wide: 펼친 화면, 두 쪽 펼침 ---------- */
+:root[data-mode="wide"] .flow { column-rule: 1px solid var(--line); }
+:root[data-mode="wide"] .stage { padding-inline: 28px; }
+
+/* ---------- tabletop: 위 화면은 읽기 전용, 아래 화면은 큰 컨트롤 ---------- */
+:root[data-mode="tabletop"] .app {
+  padding-top: 0;
+  grid-template-rows: var(--seg-top-h) var(--hinge-h) auto minmax(0, 1fr);
+  grid-template-areas: "stage" "." "top" "controls";
+}
+:root[data-mode="tabletop"] .stage { padding-top: max(16px, env(safe-area-inset-top)); }
+:root[data-mode="tabletop"] .topbar { border-bottom: none; border-top: 1px solid var(--line); }
+:root[data-mode="tabletop"] .controls {
+  border-top: none;
+  gap: 16px;
+  padding: 12px var(--pad) 20px;
+}
+:root[data-mode="tabletop"] .controls button {
+  min-width: 96px;
+  min-height: 72px;
+  font-size: 34px;
+  border-radius: 18px;
+  background: var(--panel);
+}
+:root[data-mode="tabletop"] .page-label { font-size: 16px; }
+
+/* ---------- 힌지 표시 (시뮬레이션이나 물리적 간격이 있을 때만 보임) ---------- */
+.hinge {
+  position: fixed;
+  display: none;
+  pointer-events: none;
+  z-index: 5;
+  background: repeating-linear-gradient(45deg, transparent 0 6px, rgb(128 128 128 / .35) 6px 12px);
+}
+:root[data-mode="book"] .hinge { display: block; top: 0; bottom: 0; left: var(--hinge-x); width: var(--hinge-w); }
+:root[data-mode="tabletop"] .hinge { display: block; left: 0; right: 0; top: var(--seg-top-h); height: var(--hinge-h); }
+
+/* ---------- 상태 패널 ---------- */
+.debug {
+  position: fixed;
+  z-index: 10;
+  top: calc(60px + env(safe-area-inset-top));
+  right: 12px;
+  width: min(320px, calc(100vw - 24px));
+  padding: 12px 14px;
+  font-size: 13px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgb(0 0 0 / .18);
+}
+.debug dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 0 0 12px; }
+.debug dt { color: var(--muted); }
+.debug dd { margin: 0; font-family: ui-monospace, "SF Mono", Menlo, monospace; overflow-wrap: anywhere; }
+.debug label { display: grid; gap: 6px; color: var(--muted); }
+.debug select { color: var(--fg); background: var(--bg); }
