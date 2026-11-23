@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>55형 평면도</title>
+<style>
+  :root{--bg:#fff;--wall:#111;--room:#f7f7f4;--wet:#e8f1f6;--bal:#eef3ea;--dim:#c0392b;--txt:#111}
+  body{margin:0;background:var(--bg);font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif;color:var(--txt)}
+  h1{font-size:18px;margin:16px}
+  svg{width:100%;max-width:900px;height:auto;display:block;margin:0 auto}
+  .room{stroke:var(--wall);stroke-width:2}
+  .wall{fill:none;stroke:var(--wall);stroke-width:7;stroke-linejoin:miter}
+  .lbl{font-size:15px;font-weight:700;text-anchor:middle;text-decoration:underline}
+  .sm{font-size:9px;text-anchor:middle}
+  .dim line{stroke:var(--dim);stroke-width:1}
+  .dim text{fill:var(--dim);font-size:13px;font-weight:700;text-anchor:middle}
+  .door{fill:none;stroke:#555;stroke-width:1}
+  .fx{fill:#fff;stroke:#333;stroke-width:1.2}
+</style>
+</head>
+<body>
+<h1>■ 55형 평면도 (벡터)</h1>
+<svg viewBox="0 140 800 890" xmlns="http://www.w3.org/2000/svg">
+  <!-- 외벽 -->
+  <polyline class="wall" points="180,158 570,158 570,305 595,305 595,500 783,500 783,898 320,898 320,870 290,870 290,1008 25,1008 25,220 180,220 180,158"/>
+
+  <!-- 실 -->
+  <rect class="room" x="25"  y="243" width="197" height="217" fill="var(--room)"/>
+  <rect class="room" x="25"  y="468" width="115" height="42"  fill="#fff"/>
+  <rect class="room" x="35"  y="515" width="105" height="115" fill="var(--wet)"/>
+  <rect class="room" x="238" y="180" width="150" height="365" fill="var(--room)"/>
+  <rect class="room" x="395" y="172" width="155" height="140" fill="var(--bal)"/>
+  <rect class="room" x="388" y="330" width="57"  height="215" fill="#fff"/>
+  <rect class="room" x="455" y="365" width="113" height="165" fill="var(--wet)"/>
+  <rect class="room" x="148" y="545" width="480" height="83"  fill="var(--room)"/>
+  <rect class="room" x="628" y="525" width="102" height="103" fill="var(--room)"/>
+  <rect class="room" x="730" y="525" width="40"  height="103" fill="#fff"/>
+  <rect class="room" x="25"  y="640" width="265" height="230" fill="var(--room)"/>
+  <rect class="room" x="300" y="632" width="245" height="258" fill="var(--room)"/>
+  <rect class="room" x="555" y="632" width="215" height="258" fill="var(--room)"/>
+  <rect class="room" x="657" y="645" width="73"  height="45"  fill="#fff"/>
+  <rect class="room" x="170" y="880" width="110" height="125" fill="var(--bal)"/>
+  <rect class="room" x="25"  y="895" width="135" height="100" fill="var(--bal)"/>
+
+  <!-- 설비 -->
+  <rect class="fx" x="300" y="182" width="75" height="45" rx="4"/><circle class="fx" cx="335" cy="207" r="6"/>
+  <rect class="fx" x="250" y="298" width="40" height="47"/>
+  <circle class="fx" cx="262" cy="310" r="5"/><circle class="fx" cx="280" cy="310" r="5"/>
+  <circle class="fx" cx="262" cy="332" r="5"/><circle class="fx" cx="280" cy="332" r="5"/>
+  <rect class="fx" x="465" y="370" width="98" height="45" rx="18"/>
+  <rect class="fx" x="463" y="425" width="35" height="38"/>
+  <ellipse class="fx" cx="485" cy="500" rx="18" ry="22"/>
+  <ellipse class="fx" cx="60" cy="550" rx="15" ry="22"/>
+  <rect class="fx" x="90" y="523" width="35" height="32"/>
+  <rect class="fx" x="485" y="232" width="62" height="62"/>
+  <line class="door" x1="485" y1="232" x2="547" y2="294"/><line class="door" x1="547" y1="232" x2="485" y2="294"/>
+  <rect class="fx" x="60" y="967" width="65" height="22"/>
+
+  <!-- 문 (호) -->
+  <path class="door" d="M150,545 L150,470 A75,75 0 0 1 222,545"/>
+  <path class="door" d="M140,640 L80,640 A60,60 0 0 0 140,580"/>
+  <path class="door" d="M212,640 L212,710 A70,70 0 0 0 282,640"/>
+  <path class="door" d="M568,530 L510,530 A58,58 0 0 1 568,472"/>
+  <path class="door" d="M555,640 L555,710 A70,70 0 0 0 625,640"/>
+  <path class="door" d="M652,525 L652,422 A78,103 0 0 1 730,525"/>
+  <path class="door" d="M170,975 L170,925 A50,50 0 0 1 220,975"/>
+
+  <!-- 실명 -->
+  <text class="lbl" x="125" y="355">침실2</text>
+  <text class="lbl" x="275" y="490">주방</text>
+  <text class="lbl" x="432" y="275">발코니2</text>
+  <text class="lbl" x="533" y="455">욕실1</text>
+  <text class="lbl" x="62"  y="590">욕실2</text>
+  <text class="lbl" x="690" y="583">현관</text>
+  <text class="sm"  x="750" y="580">신발장</text>
+  <text class="sm"  x="693" y="672">옷장</text>
+  <text class="lbl" x="125" y="760">안방</text>
+  <text class="lbl" x="420" y="770">거실</text>
+  <text class="lbl" x="630" y="780">침실1</text>
+  <text class="lbl" x="230" y="948">발코니1</text>
+  <text class="sm"  x="92"  y="935">대피공간</text>
+  <text class="sm"  x="92"  y="982">실외기</text>
+  <text class="sm"  x="515" y="275">세탁기 1000×1000</text>
+
+  <!-- 창/문 규격 -->
+  <text class="sm" x="125" y="212">창문 1500×1200</text>
+  <text class="sm" x="335" y="152">창문 1000×1200</text>
+  <text class="sm" x="435" y="152">창문 600×900</text>
+  <text class="sm" x="185" y="558">문 900×2200</text>
+  <text class="sm" x="540" y="558">문 750×2100</text>
+  <text class="sm" x="690" y="537">문 1050×2200</text>
+  <text class="sm" x="108" y="652">문 750×2100</text>
+  <text class="sm" x="248" y="652">문 900×2200</text>
+  <text class="sm" x="592" y="652">문 900×2200</text>
+  <text class="sm" x="225" y="895">문 1400×2400</text>
+  <text class="sm" x="420" y="928">창문 2600×2000 (커튼박스 180)</text>
+  <text class="sm" x="650" y="928">창문 1800×1200</text>
+  <text class="sm" x="90"  y="1022">그릴 1100×2100</text>
+  <text class="sm" x="230" y="1022">창문 1300×2000</text>
+
+  <!-- 치수 -->
+  <g class="dim">
+    <line x1="25" y1="402" x2="222" y2="402"/><text x="123" y="396">2600</text>
+    <line x1="25" y1="433" x2="222" y2="433"/><text x="85" y="427">1600</text><text x="185" y="427">1000</text>
+    <line x1="238" y1="402" x2="445" y2="402"/><text x="264" y="396">700</text><text x="340" y="396">1300</text><text x="415" y="396">700</text>
+    <line x1="185" y1="243" x2="185" y2="460"/><text x="200" y="355" transform="rotate(-90 200 355)">2850</text>
+    <line x1="330" y1="232" x2="330" y2="402"/><text x="320" y="330" transform="rotate(-90 320 330)">2550</text>
+    <line x1="330" y1="402" x2="330" y2="545"/><text x="320" y="480" transform="rotate(-90 320 480)">1600</text>
+    <line x1="148" y1="578" x2="628" y2="578"/><text x="195" y="572">1200</text><text x="310" y="572">2000</text><text x="505" y="572">3150</text>
+    <line x1="148" y1="605" x2="300" y2="605"/><text x="225" y="600">2000</text>
+    <line x1="540" y1="605" x2="628" y2="605"/><text x="585" y="600">1150</text>
+    <line x1="480" y1="545" x2="480" y2="628"/><text x="470" y="590" transform="rotate(-90 470 590)">1100</text>
+    <line x1="182" y1="640" x2="182" y2="870"/><text x="172" y="755" transform="rotate(-90 172 755)">3000</text>
+    <line x1="480" y1="632" x2="480" y2="890"/><text x="470" y="765" transform="rotate(-90 470 765)">3500</text>
+    <line x1="690" y1="632" x2="690" y2="890"/><text x="680" y="795" transform="rotate(-90 680 795)">2700</text>
+    <line x1="745" y1="632" x2="745" y2="890"/><text x="735" y="765" transform="rotate(-90 735 765)">3350</text>
+    <line x1="690" y1="645" x2="690" y2="690"/><text x="680" y="668" transform="rotate(-90 680 668)">650</text>
+    <line x1="25" y1="835" x2="290" y2="835"/><text x="155" y="829">3400</text>
+    <line x1="300" y1="835" x2="545" y2="835"/><text x="420" y="829">3200</text>
+    <line x1="555" y1="835" x2="770" y2="835"/><text x="660" y="829">2800</text>
+    <line x1="182" y1="468" x2="182" y2="545"/><text x="172" y="507" transform="rotate(-90 172 507)">1020</text>
+  </g>
+</svg>
+</body>
+</html>
