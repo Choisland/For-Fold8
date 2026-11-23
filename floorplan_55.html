@@ -9,27 +9,27 @@
   body{margin:0;background:var(--bg);font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif;color:var(--txt)}
   header{padding:12px 16px}
   h1{font-size:18px;margin:0 0 4px}
-  p{margin:0;font-size:12px;color:#666}
+  p{margin:0 0 8px;font-size:12px;color:#666}
+  label{font-size:13px;margin-right:12px}
   svg{width:100%;max-width:960px;height:auto;display:block;margin:0 auto}
-  .room{stroke:#333;stroke-width:30}
-  .wall{fill:none;stroke:var(--wall);stroke-width:180;stroke-linejoin:miter}
-  .lbl{font-size:300px;font-weight:700;text-anchor:middle;fill:var(--txt)}
-  .area{font-size:170px;text-anchor:middle;fill:#666}
-  .sm{font-size:140px;text-anchor:middle;fill:#444}
-  .dim line{stroke:var(--dim);stroke-width:18}
-  .dim .tick{stroke-width:24}
-  .dim text{fill:var(--dim);font-size:190px;font-weight:700;text-anchor:middle}
-  .door{fill:none;stroke:#666;stroke-width:20}
-  .fx{fill:#fff;stroke:#333;stroke-width:25}
-  .grid line{stroke:#000;stroke-opacity:.05;stroke-width:8}
+  .room{stroke:none}
+  .lbl{font-size:260px;font-weight:700;text-anchor:middle;fill:var(--txt)}
+  .area{font-size:150px;text-anchor:middle;fill:#666}
+  .sm{font-size:120px;text-anchor:middle;fill:#444}
+  .dim line{stroke:var(--dim);stroke-width:16}
+  .dim text{fill:var(--dim);font-size:170px;font-weight:700;text-anchor:middle;paint-order:stroke;stroke:#fff;stroke-width:40px}
+  .door{fill:none;stroke:#555;stroke-width:18}
+  .fx{fill:#fff;stroke:#333;stroke-width:22}
 </style>
 </head>
 <body>
 <header>
-  <h1>■ 55형 평면도 — 축척 1:1 mm 좌표</h1>
-  <p>모든 좌표는 mm 단위입니다(1 SVG 단위 = 1mm). 격자 간격 500mm. 칸막이벽 두께는 200mm로 가정했습니다.</p>
+  <h1>■ 55형 평면도 — 원본 정합 벡터 (1 SVG 단위 = 1mm)</h1>
+  <p>원본 이미지의 벽선을 픽셀 단위로 추출해 좌표화했습니다. 축척은 치수선(2600+700+1300+700=5300)에서 구한 1px = 12.6mm입니다.</p>
+  <label>원본 겹쳐보기 <input id="op" type="range" min="0" max="100" value="0"></label>
+  <label><input id="ex" type="checkbox"> 차이 강조(원본 빨강/벡터 파랑)</label>
 </header>
-<svg id="plan" viewBox="-900 -1900 11600 13000" xmlns="http://www.w3.org/2000/svg"></svg>
+<svg id="plan" viewBox="-500 -1500 10400 11900" xmlns="http://www.w3.org/2000/svg"></svg>
 <script>
 const NS = "http://www.w3.org/2000/svg";
 const svg = document.getElementById("plan");
@@ -39,121 +39,135 @@ const el = (tag, attrs, parent = svg, text) => {
   if (text != null) e.textContent = text;
   parent.appendChild(e); return e;
 };
+// 원본 이미지 픽셀 → mm (원점: 침실2 내부 좌상단 px(25,243))
+const S = 12.6, OX = 25, OY = 243;
+const X = px => Math.round((px - OX) * S), Y = py => Math.round((py - OY) * S);
+const L = v => Math.round(v * S);
 
-// 격자 (500mm)
-const g = el("g", {class: "grid"});
-for (let x = -500; x <= 10500; x += 500) el("line", {x1: x, y1: -1500, x2: x, y2: 10500}, g);
-for (let y = -1500; y <= 10500; y += 500) el("line", {x1: -500, y1: y, x2: 10500, y2: y}, g);
+const plan = el("g", {id: "vec"});
 
-// 실: [이름, x, y, 폭, 깊이, 채움, 면적표시]
-const R = "var(--room)", W = "var(--wet)", B = "var(--bal)", S = "#fff";
+// 외벽 외곽 (채운 뒤 실을 얹으면 빈 틈이 벽이 됨)
+const outer = [[10,216],[178,216],[178,157],[567,157],[567,309],[601,309],[601,501],[783,501],
+               [783,918],[306,918],[306,1010],[10,1010]];
+el("polygon", {points: outer.map(([x, y]) => X(x) + "," + Y(y)).join(" "), fill: "var(--wall)"}, plan);
+
+// 실: [이름, x1, y1, x2, y2(px), 채움, 면적표시, 라벨 오프셋 dx, dy(px)]
+const R = "var(--room)", W = "var(--wet)", B = "var(--bal)", F = "#fff";
 const rooms = [
-  ["침실2",    0,    0, 2600, 2850, R, true],
-  ["에어컨",   0, 2950, 1600,  400, S],
-  ["욕실2",    0, 3450, 1600, 1600, W, true, 0, 400],
-  ["주방",  2800, -200, 2000, 4150, R, true, 300, 900],
-  ["수납",  4800, 1100,  700, 2850, S],
-  ["발코니2",4800,-1000, 2100, 1900, B, false, -500, 650],
-  ["욕실1", 5600, 1600, 1550, 2150, W, true, 250, 300],
-  ["복도",  1600, 3950, 6350, 1100, R],
-  ["현관",  7950, 3650, 1250, 1400, R],
-  ["신발장",9200, 3650,  600, 1400, S],
-  ["안방",     0, 5250, 3400, 3000, R, true, -500, 0],
-  ["거실",  3600, 5050, 3200, 3700, R, true],
-  ["침실1", 7000, 5250, 2800, 3350, R, true],
-  ["옷장",  7900, 5250, 1100,  650, S],
-  ["발코니1",1800, 8450, 1400, 1600, B],
-  ["대피공간",  0, 8450, 1600, 1350, B],
+  ["침실2",   25, 243, 223, 459, R, 1, 0, -20],
+  ["",        25, 469, 136, 504, F],
+  ["욕실2",   34, 515, 136, 631, W, 1, -10, 25],
+  ["",       237, 180, 379, 332, R],
+  ["주방",   237, 332, 389, 546, R, 1, 15, 0],
+  ["수납",   389, 331, 443, 546, F],
+  ["발코니2",394, 172, 566, 309, B, 0, -35, 20],
+  ["",       453, 309, 601, 331, F],
+  ["",       567, 309, 601, 546, F],
+  ["욕실1",  453, 365, 567, 532, W, 1, 25, 10],
+  ["",       453, 532, 628, 546, R],
+  ["복도",   148, 546, 628, 630, R],
+  ["현관",   628, 525, 729, 630, R],
+  ["신발장", 729, 525, 768, 630, F],
+  ["안방",    25, 641, 284, 869, R, 1, -45, 0],
+  ["거실",   299, 630, 540, 895, R, 1],
+  ["침실1",  556, 641, 768, 895, R, 1, -30, 30],
+  ["옷장",   657, 641, 768, 690, F],
+  ["",       299, 895, 783, 917, F],
+  ["",       556, 895, 768, 906, F],
+  ["",        25, 869, 170, 896, F],
+  ["발코니1",170, 885, 280, 991, B],
+  ["대피공간", 25, 896, 159, 995, B, 0, 22, -10],
 ];
-for (const [n, x0, y0, w, h, f, a, ox = 0, oy = 0] of rooms) {
-  const x = x0, y = y0;
-  el("rect", {class: "room", x, y, width: w, height: h, fill: f});
-  const small = w < 1300 || h < 800;
-  el("text", {class: small ? "sm" : "lbl", x: x + w / 2 + ox, y: y + h / 2 + oy + (small ? 50 : 0)}, svg, n);
-  if (a) el("text", {class: "area", x: x + w / 2 + ox, y: y + h / 2 + oy + 260}, svg, (w * h / 1e6).toFixed(2) + " ㎡");
+for (const [n, x1, y1, x2, y2, f, a, dx = 0, dy = 0] of rooms) {
+  el("rect", {class: "room", x: X(x1), y: Y(y1), width: L(x2 - x1), height: L(y2 - y1), fill: f}, plan);
+  if (!n) continue;
+  const cx = X((x1 + x2) / 2 + dx), cy = Y((y1 + y2) / 2 + dy);
+  const small = n === "대피공간" || (x2 - x1) < 90 || (y2 - y1) < 60;
+  el("text", {class: small ? "sm" : "lbl", x: cx, y: cy + (small ? 40 : 0)}, plan, n);
+  if (a) el("text", {class: "area", x: cx, y: cy + 220}, plan, (L(x2 - x1) * L(y2 - y1) / 1e6).toFixed(2) + " ㎡");
 }
 
-// 외벽
-el("polyline", {class: "wall", points: [
-  [0,0],[2700,0],[2700,-200],[4800,-200],[4800,-1000],[6900,-1000],[6900,1500],[7250,1500],
-  [7250,3650],[9900,3650],[9900,8750],[3500,8750],[3500,8350],[3200,8350],[3200,10050],[0,10050],[0,0]
-].map(p => p.join(",")).join(" ")});
+// 설비 (px)
+const fx = (tag, a) => el(tag, Object.assign({class: "fx"}, a), plan);
+const box = (x1, y1, x2, y2, extra = {}) => fx("rect", Object.assign({x: X(x1), y: Y(y1), width: L(x2 - x1), height: L(y2 - y1)}, extra));
+box(304, 192, 365, 225, {rx: 50}); fx("circle", {cx: X(334), cy: Y(208), r: L(6)});
+box(249, 298, 287, 343);
+for (const [x, y] of [[259,309],[277,309],[259,332],[277,332]]) fx("circle", {cx: X(x), cy: Y(y), r: L(5)});
+box(464, 370, 560, 414, {rx: 200});
+box(463, 426, 497, 466);
+fx("ellipse", {cx: X(485), cy: Y(500), rx: L(18), ry: L(23)});
+fx("ellipse", {cx: X(58), cy: Y(552), rx: L(17), ry: L(24)});
+box(88, 529, 128, 557);
+box(487, 232, 546, 294);
+el("path", {class: "door", d: `M${X(487)},${Y(232)}L${X(546)},${Y(294)}M${X(546)},${Y(232)}L${X(487)},${Y(294)}`}, plan);
+box(192, 172, 219, 221);
+el("path", {class: "door", d: `M${X(192)},${Y(172)}L${X(219)},${Y(221)}M${X(219)},${Y(172)}L${X(192)},${Y(221)}`}, plan);
+box(37, 907, 87, 959); box(60, 967, 125, 989);
+el("text", {class: "sm", x: X(92), y: Y(983)}, plan, "실외기");
+el("text", {class: "sm", x: X(565), y: Y(325)}, plan, "세탁기 1000×1000");
 
-// 설비
-const fx = (tag, a) => el(tag, Object.assign({class: "fx"}, a));
-fx("rect", {x: 3550, y: -150, width: 1000, height: 550, rx: 60});   // 싱크
-fx("circle", {cx: 4050, cy: 125, r: 80});
-fx("rect", {x: 2850, y: 1500, width: 600, height: 600});            // 쿡탑
-for (const [cx, cy] of [[3000,1650],[3300,1650],[3000,1950],[3300,1950]]) fx("circle", {cx, cy, r: 90});
-fx("rect", {x: 5700, y: 1650, width: 1400, height: 700, rx: 250});  // 욕조
-fx("rect", {x: 5650, y: 2500, width: 500, height: 450});            // 세면대
-fx("ellipse", {cx: 5950, cy: 3400, rx: 220, ry: 300});              // 변기
-fx("ellipse", {cx: 350, cy: 3900, rx: 220, ry: 300});
-fx("rect", {x: 900, y: 3550, width: 500, height: 450});
-fx("rect", {x: 5850, y: -900, width: 1000, height: 1000});          // 세탁기 자리
-el("line", {class: "door", x1: 5850, y1: -900, x2: 6850, y2: 100});
-el("line", {class: "door", x1: 6850, y1: -900, x2: 5850, y2: 100});
-el("text", {class: "sm", x: 6350, y: 300}, svg, "세탁기 1000×1000");
-fx("rect", {x: 300, y: 9350, width: 1000, height: 350});
-el("text", {class: "sm", x: 800, y: 9570}, svg, "실외기");
-
-// 문: [힌지x, 힌지y, 폭, 시작각, 끝각]  (각도: 0=+x, 90=+y)
+// 문: [힌지x, 힌지y, 반경(px), 시작각, 끝각]
 const doors = [
-  [1650, 3950,  900, -90,   0],   // 침실2
-  [1600, 5250,  750, 180, 270],   // 욕실2
-  [2400, 5250,  900,   0,  90],   // 안방
-  [7150, 3750,  750, 180, 270],   // 욕실1
-  [7050, 5250,  900,   0,  90],   // 침실1
-  [8000, 3650, 1050, -90,   0],   // 현관
-  [1800, 9800,  700, -90,   0],   // 발코니1→대피
+  [148, 546, 72, -90, 0], [136, 631, 56, 180, 270], [212, 641, 68, 0, 90],
+  [567, 532, 56, 180, 270], [556, 641, 70, 0, 90], [650, 525, 79, -90, 0], [170, 972, 50, -90, 0],
 ];
-for (const [hx, hy, w, a0, a1] of doors) {
-  const p = a => [hx + w * Math.cos(a * Math.PI / 180), hy + w * Math.sin(a * Math.PI / 180)];
+for (const [hx, hy, r, a0, a1] of doors) {
+  const p = a => [X(hx + r * Math.cos(a * Math.PI / 180)), Y(hy + r * Math.sin(a * Math.PI / 180))];
   const [x0, y0] = p(a0), [x1, y1] = p(a1);
-  el("path", {class: "door", d: `M${hx},${hy} L${x0},${y0} A${w},${w} 0 0 1 ${x1},${y1}`});
+  el("path", {class: "door", d: `M${X(hx)},${Y(hy)}L${x0},${y0}A${L(r)},${L(r)} 0 0 1 ${x1},${y1}`}, plan);
 }
 
-// 창/문 규격
+// 창/문 규격 (px)
 const notes = [
-  [1300, -350, "창문 1500×1200 (커튼박스 180)"], [4050, -450, "창문 1000×1200"],
-  [5850, -1200, "창문 600×900"], [5200, 9050, "창문 2600×2000 (커튼박스 180)"],
-  [8400, 8950, "창문 1800×1200"], [800, 10400, "그릴 1100×2100"],
-  [2500, 10400, "창문 1300×2000"], [2500, 8300, "문 1400×2400"],
-  [8575, 3500, "문 1050×2200"],
+  [110, 212, "창문 1500×1200"], [335, 152, "창문 1000×1200"], [435, 152, "창문 600×900"],
+  [185, 556, "문 900×2200"], [540, 556, "문 750×2100"], [690, 535, "문 1050×2200"],
+  [108, 652, "문 750×2100"], [248, 652, "문 900×2200"], [592, 652, "문 900×2200"],
+  [228, 895, "문 1400×2400"], [400, 930, "창문 2600×2000 (커튼박스 180)"], [650, 930, "창문 1800×1200"],
+  [80, 1022, "그릴 1100×2100"], [230, 1022, "창문 1300×2000"],
 ];
-for (const [x, y, t] of notes) el("text", {class: "sm", x, y}, svg, t);
+for (const [x, y, t] of notes) el("text", {class: "sm", x: X(x), y: Y(y)}, plan, t);
 
-// 치수선: [x1, y1, x2, y2, 라벨]
-const D = el("g", {class: "dim"});
+// 치수선 (px 위치, 라벨은 도면 표기값)
+const D = el("g", {class: "dim"}, plan);
 const dim = (x1, y1, x2, y2, t) => {
-  el("line", {x1, y1, x2, y2}, D);
-  const v = x1 === x2;
+  el("line", {x1: X(x1), y1: Y(y1), x2: X(x2), y2: Y(y2)}, D);
   for (const [x, y] of [[x1, y1], [x2, y2]])
-    el("line", {class: "tick", x1: x - 90, y1: y + 90, x2: x + 90, y2: y - 90}, D);
-  const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
-  el("text", v ? {x: mx - 70, y: my, transform: `rotate(-90 ${mx - 70} ${my})`} : {x: mx, y: my - 70}, D, t);
+    el("line", {x1: X(x) - 80, y1: Y(y) + 80, x2: X(x) + 80, y2: Y(y) - 80}, D);
+  const mx = X((x1 + x2) / 2), my = Y((y1 + y2) / 2), v = x1 === x2;
+  el("text", v ? {x: mx - 60, y: my, transform: `rotate(-90 ${mx - 60} ${my})`} : {x: mx, y: my - 60}, D, t);
 };
-const chain = (pts, y, labels) => { for (let i = 0; i < labels.length; i++) dim(pts[i], y, pts[i + 1], y, labels[i]); };
-const vchain = (pts, x, labels) => { for (let i = 0; i < labels.length; i++) dim(x, pts[i], x, pts[i + 1], labels[i]); };
+const hch = (y, xs, ls) => ls.forEach((t, i) => dim(xs[i], y, xs[i + 1], y, t));
+dim(25, 401, 231, 401, "2600");
+hch(435, [25, 148, 222], ["1600", "1000"]);
+hch(401, [231, 290, 389, 445], ["700", "1300", "700"]);
+dim(184, 243, 184, 459, "2850");
+dim(328, 233, 328, 402, "2550");
+dim(328, 402, 328, 546, "1600");
+dim(184, 467, 184, 546, "1020");
+hch(577, [148, 238, 389, 628], ["1200", "2000", "3150"]);
+dim(148, 607, 299, 607, "2000");
+dim(540, 607, 628, 607, "1150");
+dim(483, 546, 483, 630, "1100");
+dim(184, 641, 184, 869, "3000");
+dim(483, 630, 483, 895, "3500");
+dim(691, 641, 691, 690, "650");
+dim(691, 690, 691, 895, "2700");
+dim(741, 641, 741, 895, "3350");
+hch(838, [25, 284], ["3400"]);
+hch(838, [299, 540], ["3200"]);
+hch(838, [556, 768], ["2800"]);
 
-dim(0, 1950, 2600, 1950, "2600");
-chain([0, 1600, 2600], 2350, ["1600", "1000"]);
-chain([2800, 3500, 4800, 5500], 1950, ["700", "1300", "700"]);
-dim(2200, 0, 2200, 2850, "2850");
-vchain([-200, 2350, 3950], 4300, ["2550", "1600"]);
-dim(2200, 2950, 2200, 3950, "1020");
-chain([1600, 2800, 4800, 7950], 4350, ["1200", "2000", "3150"]);
-dim(1600, 4800, 3600, 4800, "2000");
-dim(6800, 4800, 7950, 4800, "1150");
-dim(6200, 3950, 6200, 5050, "1100");
-dim(2200, 5250, 2200, 8250, "3000");
-dim(6200, 5050, 6200, 8750, "3500");
-dim(8700, 5900, 8700, 8600, "2700");
-dim(9500, 5250, 9500, 8600, "3350");
-dim(8700, 5250, 8700, 5900, "650");
-dim(0, 7800, 3400, 7800, "3400");
-dim(3600, 7800, 6800, 7800, "3200");
-dim(7000, 7800, 9800, 7800, "2800");
+// 원본 겹쳐보기
+const img = el("image", {href: "floorplan_55_ref.jpg", x: X(0), y: Y(0), width: L(794), height: L(1123),
+  opacity: 0, style: "pointer-events:none"});
+const op = document.getElementById("op"), ex = document.getElementById("ex");
+const upd = () => {
+  img.setAttribute("opacity", op.value / 100);
+  img.style.mixBlendMode = ex.checked ? "multiply" : "normal";
+  img.style.filter = ex.checked ? "sepia(1) saturate(8) hue-rotate(-50deg)" : "none";
+  document.getElementById("vec").style.filter = ex.checked ? "sepia(1) saturate(6) hue-rotate(170deg)" : "none";
+};
+op.oninput = upd; ex.onchange = () => { if (ex.checked && op.value == 0) op.value = 60; upd(); };
 </script>
 </body>
 </html>
