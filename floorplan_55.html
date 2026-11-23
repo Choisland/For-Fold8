@@ -5,122 +5,155 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>55형 평면도</title>
 <style>
-  :root{--bg:#fff;--wall:#111;--room:#f7f7f4;--wet:#e8f1f6;--bal:#eef3ea;--dim:#c0392b;--txt:#111}
+  :root{--bg:#fff;--wall:#111;--room:#f7f7f4;--wet:#e3eef5;--bal:#ebf2e6;--dim:#c0392b;--txt:#111}
   body{margin:0;background:var(--bg);font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif;color:var(--txt)}
-  h1{font-size:18px;margin:16px}
-  svg{width:100%;max-width:900px;height:auto;display:block;margin:0 auto}
-  .room{stroke:var(--wall);stroke-width:2}
-  .wall{fill:none;stroke:var(--wall);stroke-width:7;stroke-linejoin:miter}
-  .lbl{font-size:15px;font-weight:700;text-anchor:middle;text-decoration:underline}
-  .sm{font-size:9px;text-anchor:middle}
-  .dim line{stroke:var(--dim);stroke-width:1}
-  .dim text{fill:var(--dim);font-size:13px;font-weight:700;text-anchor:middle}
-  .door{fill:none;stroke:#555;stroke-width:1}
-  .fx{fill:#fff;stroke:#333;stroke-width:1.2}
+  header{padding:12px 16px}
+  h1{font-size:18px;margin:0 0 4px}
+  p{margin:0;font-size:12px;color:#666}
+  svg{width:100%;max-width:960px;height:auto;display:block;margin:0 auto}
+  .room{stroke:#333;stroke-width:30}
+  .wall{fill:none;stroke:var(--wall);stroke-width:180;stroke-linejoin:miter}
+  .lbl{font-size:300px;font-weight:700;text-anchor:middle;fill:var(--txt)}
+  .area{font-size:170px;text-anchor:middle;fill:#666}
+  .sm{font-size:140px;text-anchor:middle;fill:#444}
+  .dim line{stroke:var(--dim);stroke-width:18}
+  .dim .tick{stroke-width:24}
+  .dim text{fill:var(--dim);font-size:190px;font-weight:700;text-anchor:middle}
+  .door{fill:none;stroke:#666;stroke-width:20}
+  .fx{fill:#fff;stroke:#333;stroke-width:25}
+  .grid line{stroke:#000;stroke-opacity:.05;stroke-width:8}
 </style>
 </head>
 <body>
-<h1>■ 55형 평면도 (벡터)</h1>
-<svg viewBox="0 140 800 890" xmlns="http://www.w3.org/2000/svg">
-  <!-- 외벽 -->
-  <polyline class="wall" points="180,158 570,158 570,305 595,305 595,500 783,500 783,898 320,898 320,870 290,870 290,1008 25,1008 25,220 180,220 180,158"/>
+<header>
+  <h1>■ 55형 평면도 — 축척 1:1 mm 좌표</h1>
+  <p>모든 좌표는 mm 단위입니다(1 SVG 단위 = 1mm). 격자 간격 500mm. 칸막이벽 두께는 200mm로 가정했습니다.</p>
+</header>
+<svg id="plan" viewBox="-900 -1900 11600 13000" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const NS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById("plan");
+const el = (tag, attrs, parent = svg, text) => {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text != null) e.textContent = text;
+  parent.appendChild(e); return e;
+};
 
-  <!-- 실 -->
-  <rect class="room" x="25"  y="243" width="197" height="217" fill="var(--room)"/>
-  <rect class="room" x="25"  y="468" width="115" height="42"  fill="#fff"/>
-  <rect class="room" x="35"  y="515" width="105" height="115" fill="var(--wet)"/>
-  <rect class="room" x="238" y="180" width="150" height="365" fill="var(--room)"/>
-  <rect class="room" x="395" y="172" width="155" height="140" fill="var(--bal)"/>
-  <rect class="room" x="388" y="330" width="57"  height="215" fill="#fff"/>
-  <rect class="room" x="455" y="365" width="113" height="165" fill="var(--wet)"/>
-  <rect class="room" x="148" y="545" width="480" height="83"  fill="var(--room)"/>
-  <rect class="room" x="628" y="525" width="102" height="103" fill="var(--room)"/>
-  <rect class="room" x="730" y="525" width="40"  height="103" fill="#fff"/>
-  <rect class="room" x="25"  y="640" width="265" height="230" fill="var(--room)"/>
-  <rect class="room" x="300" y="632" width="245" height="258" fill="var(--room)"/>
-  <rect class="room" x="555" y="632" width="215" height="258" fill="var(--room)"/>
-  <rect class="room" x="657" y="645" width="73"  height="45"  fill="#fff"/>
-  <rect class="room" x="170" y="880" width="110" height="125" fill="var(--bal)"/>
-  <rect class="room" x="25"  y="895" width="135" height="100" fill="var(--bal)"/>
+// 격자 (500mm)
+const g = el("g", {class: "grid"});
+for (let x = -500; x <= 10500; x += 500) el("line", {x1: x, y1: -1500, x2: x, y2: 10500}, g);
+for (let y = -1500; y <= 10500; y += 500) el("line", {x1: -500, y1: y, x2: 10500, y2: y}, g);
 
-  <!-- 설비 -->
-  <rect class="fx" x="300" y="182" width="75" height="45" rx="4"/><circle class="fx" cx="335" cy="207" r="6"/>
-  <rect class="fx" x="250" y="298" width="40" height="47"/>
-  <circle class="fx" cx="262" cy="310" r="5"/><circle class="fx" cx="280" cy="310" r="5"/>
-  <circle class="fx" cx="262" cy="332" r="5"/><circle class="fx" cx="280" cy="332" r="5"/>
-  <rect class="fx" x="465" y="370" width="98" height="45" rx="18"/>
-  <rect class="fx" x="463" y="425" width="35" height="38"/>
-  <ellipse class="fx" cx="485" cy="500" rx="18" ry="22"/>
-  <ellipse class="fx" cx="60" cy="550" rx="15" ry="22"/>
-  <rect class="fx" x="90" y="523" width="35" height="32"/>
-  <rect class="fx" x="485" y="232" width="62" height="62"/>
-  <line class="door" x1="485" y1="232" x2="547" y2="294"/><line class="door" x1="547" y1="232" x2="485" y2="294"/>
-  <rect class="fx" x="60" y="967" width="65" height="22"/>
+// 실: [이름, x, y, 폭, 깊이, 채움, 면적표시]
+const R = "var(--room)", W = "var(--wet)", B = "var(--bal)", S = "#fff";
+const rooms = [
+  ["침실2",    0,    0, 2600, 2850, R, true],
+  ["에어컨",   0, 2950, 1600,  400, S],
+  ["욕실2",    0, 3450, 1600, 1600, W, true, 0, 400],
+  ["주방",  2800, -200, 2000, 4150, R, true, 300, 900],
+  ["수납",  4800, 1100,  700, 2850, S],
+  ["발코니2",4800,-1000, 2100, 1900, B, false, -500, 650],
+  ["욕실1", 5600, 1600, 1550, 2150, W, true, 250, 300],
+  ["복도",  1600, 3950, 6350, 1100, R],
+  ["현관",  7950, 3650, 1250, 1400, R],
+  ["신발장",9200, 3650,  600, 1400, S],
+  ["안방",     0, 5250, 3400, 3000, R, true, -500, 0],
+  ["거실",  3600, 5050, 3200, 3700, R, true],
+  ["침실1", 7000, 5250, 2800, 3350, R, true],
+  ["옷장",  7900, 5250, 1100,  650, S],
+  ["발코니1",1800, 8450, 1400, 1600, B],
+  ["대피공간",  0, 8450, 1600, 1350, B],
+];
+for (const [n, x0, y0, w, h, f, a, ox = 0, oy = 0] of rooms) {
+  const x = x0, y = y0;
+  el("rect", {class: "room", x, y, width: w, height: h, fill: f});
+  const small = w < 1300 || h < 800;
+  el("text", {class: small ? "sm" : "lbl", x: x + w / 2 + ox, y: y + h / 2 + oy + (small ? 50 : 0)}, svg, n);
+  if (a) el("text", {class: "area", x: x + w / 2 + ox, y: y + h / 2 + oy + 260}, svg, (w * h / 1e6).toFixed(2) + " ㎡");
+}
 
-  <!-- 문 (호) -->
-  <path class="door" d="M150,545 L150,470 A75,75 0 0 1 222,545"/>
-  <path class="door" d="M140,640 L80,640 A60,60 0 0 0 140,580"/>
-  <path class="door" d="M212,640 L212,710 A70,70 0 0 0 282,640"/>
-  <path class="door" d="M568,530 L510,530 A58,58 0 0 1 568,472"/>
-  <path class="door" d="M555,640 L555,710 A70,70 0 0 0 625,640"/>
-  <path class="door" d="M652,525 L652,422 A78,103 0 0 1 730,525"/>
-  <path class="door" d="M170,975 L170,925 A50,50 0 0 1 220,975"/>
+// 외벽
+el("polyline", {class: "wall", points: [
+  [0,0],[2700,0],[2700,-200],[4800,-200],[4800,-1000],[6900,-1000],[6900,1500],[7250,1500],
+  [7250,3650],[9900,3650],[9900,8750],[3500,8750],[3500,8350],[3200,8350],[3200,10050],[0,10050],[0,0]
+].map(p => p.join(",")).join(" ")});
 
-  <!-- 실명 -->
-  <text class="lbl" x="125" y="355">침실2</text>
-  <text class="lbl" x="275" y="490">주방</text>
-  <text class="lbl" x="432" y="275">발코니2</text>
-  <text class="lbl" x="533" y="455">욕실1</text>
-  <text class="lbl" x="62"  y="590">욕실2</text>
-  <text class="lbl" x="690" y="583">현관</text>
-  <text class="sm"  x="750" y="580">신발장</text>
-  <text class="sm"  x="693" y="672">옷장</text>
-  <text class="lbl" x="125" y="760">안방</text>
-  <text class="lbl" x="420" y="770">거실</text>
-  <text class="lbl" x="630" y="780">침실1</text>
-  <text class="lbl" x="230" y="948">발코니1</text>
-  <text class="sm"  x="92"  y="935">대피공간</text>
-  <text class="sm"  x="92"  y="982">실외기</text>
-  <text class="sm"  x="515" y="275">세탁기 1000×1000</text>
+// 설비
+const fx = (tag, a) => el(tag, Object.assign({class: "fx"}, a));
+fx("rect", {x: 3550, y: -150, width: 1000, height: 550, rx: 60});   // 싱크
+fx("circle", {cx: 4050, cy: 125, r: 80});
+fx("rect", {x: 2850, y: 1500, width: 600, height: 600});            // 쿡탑
+for (const [cx, cy] of [[3000,1650],[3300,1650],[3000,1950],[3300,1950]]) fx("circle", {cx, cy, r: 90});
+fx("rect", {x: 5700, y: 1650, width: 1400, height: 700, rx: 250});  // 욕조
+fx("rect", {x: 5650, y: 2500, width: 500, height: 450});            // 세면대
+fx("ellipse", {cx: 5950, cy: 3400, rx: 220, ry: 300});              // 변기
+fx("ellipse", {cx: 350, cy: 3900, rx: 220, ry: 300});
+fx("rect", {x: 900, y: 3550, width: 500, height: 450});
+fx("rect", {x: 5850, y: -900, width: 1000, height: 1000});          // 세탁기 자리
+el("line", {class: "door", x1: 5850, y1: -900, x2: 6850, y2: 100});
+el("line", {class: "door", x1: 6850, y1: -900, x2: 5850, y2: 100});
+el("text", {class: "sm", x: 6350, y: 300}, svg, "세탁기 1000×1000");
+fx("rect", {x: 300, y: 9350, width: 1000, height: 350});
+el("text", {class: "sm", x: 800, y: 9570}, svg, "실외기");
 
-  <!-- 창/문 규격 -->
-  <text class="sm" x="125" y="212">창문 1500×1200</text>
-  <text class="sm" x="335" y="152">창문 1000×1200</text>
-  <text class="sm" x="435" y="152">창문 600×900</text>
-  <text class="sm" x="185" y="558">문 900×2200</text>
-  <text class="sm" x="540" y="558">문 750×2100</text>
-  <text class="sm" x="690" y="537">문 1050×2200</text>
-  <text class="sm" x="108" y="652">문 750×2100</text>
-  <text class="sm" x="248" y="652">문 900×2200</text>
-  <text class="sm" x="592" y="652">문 900×2200</text>
-  <text class="sm" x="225" y="895">문 1400×2400</text>
-  <text class="sm" x="420" y="928">창문 2600×2000 (커튼박스 180)</text>
-  <text class="sm" x="650" y="928">창문 1800×1200</text>
-  <text class="sm" x="90"  y="1022">그릴 1100×2100</text>
-  <text class="sm" x="230" y="1022">창문 1300×2000</text>
+// 문: [힌지x, 힌지y, 폭, 시작각, 끝각]  (각도: 0=+x, 90=+y)
+const doors = [
+  [1650, 3950,  900, -90,   0],   // 침실2
+  [1600, 5250,  750, 180, 270],   // 욕실2
+  [2400, 5250,  900,   0,  90],   // 안방
+  [7150, 3750,  750, 180, 270],   // 욕실1
+  [7050, 5250,  900,   0,  90],   // 침실1
+  [8000, 3650, 1050, -90,   0],   // 현관
+  [1800, 9800,  700, -90,   0],   // 발코니1→대피
+];
+for (const [hx, hy, w, a0, a1] of doors) {
+  const p = a => [hx + w * Math.cos(a * Math.PI / 180), hy + w * Math.sin(a * Math.PI / 180)];
+  const [x0, y0] = p(a0), [x1, y1] = p(a1);
+  el("path", {class: "door", d: `M${hx},${hy} L${x0},${y0} A${w},${w} 0 0 1 ${x1},${y1}`});
+}
 
-  <!-- 치수 -->
-  <g class="dim">
-    <line x1="25" y1="402" x2="222" y2="402"/><text x="123" y="396">2600</text>
-    <line x1="25" y1="433" x2="222" y2="433"/><text x="85" y="427">1600</text><text x="185" y="427">1000</text>
-    <line x1="238" y1="402" x2="445" y2="402"/><text x="264" y="396">700</text><text x="340" y="396">1300</text><text x="415" y="396">700</text>
-    <line x1="185" y1="243" x2="185" y2="460"/><text x="200" y="355" transform="rotate(-90 200 355)">2850</text>
-    <line x1="330" y1="232" x2="330" y2="402"/><text x="320" y="330" transform="rotate(-90 320 330)">2550</text>
-    <line x1="330" y1="402" x2="330" y2="545"/><text x="320" y="480" transform="rotate(-90 320 480)">1600</text>
-    <line x1="148" y1="578" x2="628" y2="578"/><text x="195" y="572">1200</text><text x="310" y="572">2000</text><text x="505" y="572">3150</text>
-    <line x1="148" y1="605" x2="300" y2="605"/><text x="225" y="600">2000</text>
-    <line x1="540" y1="605" x2="628" y2="605"/><text x="585" y="600">1150</text>
-    <line x1="480" y1="545" x2="480" y2="628"/><text x="470" y="590" transform="rotate(-90 470 590)">1100</text>
-    <line x1="182" y1="640" x2="182" y2="870"/><text x="172" y="755" transform="rotate(-90 172 755)">3000</text>
-    <line x1="480" y1="632" x2="480" y2="890"/><text x="470" y="765" transform="rotate(-90 470 765)">3500</text>
-    <line x1="690" y1="632" x2="690" y2="890"/><text x="680" y="795" transform="rotate(-90 680 795)">2700</text>
-    <line x1="745" y1="632" x2="745" y2="890"/><text x="735" y="765" transform="rotate(-90 735 765)">3350</text>
-    <line x1="690" y1="645" x2="690" y2="690"/><text x="680" y="668" transform="rotate(-90 680 668)">650</text>
-    <line x1="25" y1="835" x2="290" y2="835"/><text x="155" y="829">3400</text>
-    <line x1="300" y1="835" x2="545" y2="835"/><text x="420" y="829">3200</text>
-    <line x1="555" y1="835" x2="770" y2="835"/><text x="660" y="829">2800</text>
-    <line x1="182" y1="468" x2="182" y2="545"/><text x="172" y="507" transform="rotate(-90 172 507)">1020</text>
-  </g>
-</svg>
+// 창/문 규격
+const notes = [
+  [1300, -350, "창문 1500×1200 (커튼박스 180)"], [4050, -450, "창문 1000×1200"],
+  [5850, -1200, "창문 600×900"], [5200, 9050, "창문 2600×2000 (커튼박스 180)"],
+  [8400, 8950, "창문 1800×1200"], [800, 10400, "그릴 1100×2100"],
+  [2500, 10400, "창문 1300×2000"], [2500, 8300, "문 1400×2400"],
+  [8575, 3500, "문 1050×2200"],
+];
+for (const [x, y, t] of notes) el("text", {class: "sm", x, y}, svg, t);
+
+// 치수선: [x1, y1, x2, y2, 라벨]
+const D = el("g", {class: "dim"});
+const dim = (x1, y1, x2, y2, t) => {
+  el("line", {x1, y1, x2, y2}, D);
+  const v = x1 === x2;
+  for (const [x, y] of [[x1, y1], [x2, y2]])
+    el("line", {class: "tick", x1: x - 90, y1: y + 90, x2: x + 90, y2: y - 90}, D);
+  const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+  el("text", v ? {x: mx - 70, y: my, transform: `rotate(-90 ${mx - 70} ${my})`} : {x: mx, y: my - 70}, D, t);
+};
+const chain = (pts, y, labels) => { for (let i = 0; i < labels.length; i++) dim(pts[i], y, pts[i + 1], y, labels[i]); };
+const vchain = (pts, x, labels) => { for (let i = 0; i < labels.length; i++) dim(x, pts[i], x, pts[i + 1], labels[i]); };
+
+dim(0, 1950, 2600, 1950, "2600");
+chain([0, 1600, 2600], 2350, ["1600", "1000"]);
+chain([2800, 3500, 4800, 5500], 1950, ["700", "1300", "700"]);
+dim(2200, 0, 2200, 2850, "2850");
+vchain([-200, 2350, 3950], 4300, ["2550", "1600"]);
+dim(2200, 2950, 2200, 3950, "1020");
+chain([1600, 2800, 4800, 7950], 4350, ["1200", "2000", "3150"]);
+dim(1600, 4800, 3600, 4800, "2000");
+dim(6800, 4800, 7950, 4800, "1150");
+dim(6200, 3950, 6200, 5050, "1100");
+dim(2200, 5250, 2200, 8250, "3000");
+dim(6200, 5050, 6200, 8750, "3500");
+dim(8700, 5900, 8700, 8600, "2700");
+dim(9500, 5250, 9500, 8600, "3350");
+dim(8700, 5250, 8700, 5900, "650");
+dim(0, 7800, 3400, 7800, "3400");
+dim(3600, 7800, 6800, 7800, "3200");
+dim(7000, 7800, 9800, 7800, "2800");
+</script>
 </body>
 </html>
